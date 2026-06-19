@@ -1,0 +1,148 @@
+/* color scheme */
+:root {
+    --main-red: #912F40;
+    --dark-red: #702632;
+    --light-red: #ffa8b2;
+    --main-bg: #FFFFFF;
+    --soft-bg: #F8F3F2;
+    --table-bg: #ebb0b7;
+    --accent-teal: #2F9282;
+    --dark-text: #2B2B2B;
+    --light-text: #6C757D;
+}
+
+/* page background */
+.main-container {
+    background-color: var(--main-bg);
+    color: var(--dark-text);
+}
+
+/* table background */
+.table-bg {
+    background-color: var(--soft-bg);
+    box-shadow: 0 2px 6px var(--light-text);
+    border-radius: 100;
+}
+
+/* table header */
+.investment-table {
+    background-color: var(--dark-red);
+    box-shadow: 0 4px 12px var(--dark-text);
+    color: var(--accent-teal);
+}
+
+/* table body */
+.investment-table-body {
+    background-color: var(--table-bg);
+    color: var(--dark-text);
+    font-weight: 600;
+}
+
+/* update buttons */
+.update-button {
+    background-color: var(--accent-teal);
+    color: var(--soft-bg);
+}
+
+/* CRUD buttons */
+.crud-button {
+    background-color: var(--main-red);
+    box-shadow: 0 4px 12px var(--dark-text);
+    font-weight : 700;
+    color: white;
+}
+
+/* table title */
+.table-title {
+    color: var(--main-red);
+    font-weight: 800;
+    text-shadow: 1px 1px 2px rgba(0,0,0,.15);
+    border-left: 6px solid var(--main-red);
+    padding-left: 12px
+}
+
+/* page title */
+.page-header {
+    color: var(--accent-teal);
+    font-weight: 800;
+    text-shadow: 1px 1px 2px var(--light-text);
+}
+
+/* modal backgrounds */
+.form {
+    background-color: var(--light-red);
+    color: var(--dark-red);
+    border-color: var(--accent-teal);
+    font-weight: 800;
+    box-shadow: 0 4px 12px var(--dark-text);
+}
+
+/* blur modal view */
+.form::backdrop {
+    backdrop-filter: blur(5px);
+}
+
+/* cancel and  descending buttons */
+.cancel-button {
+    background-color: var(--light-text);
+    color: white;
+    text-shadow: 1px 1px 2px var(--light-text);
+}
+
+/* submit, find all, and ascending buttons */
+.submit-button {
+    background-color: var(--accent-teal);
+    color: white;
+    text-shadow: 1px 1px 2px var(--light-text);
+}
+
+/* CRUD form title */
+.form-title {
+    text-shadow: 1px 1px 2px var(--light-text);
+    font-weight: 700;
+}
+
+/* labels for CRUD forms */
+.labels {
+    text-shadow: 1px 1px 2px var(--light-text);
+    font-weight: 700;
+}
+
+/* labels for find form */
+.find-labels {
+    text-shadow: 1px 1px 2px var(--light-text);
+    font-weight: 700;
+    font-size: 20px
+}
+
+/* labels for sort form */
+.sort-labels {
+    text-shadow: 1px 1px 2px var(--light-text);
+    font-weight: 700;
+    font-size: 24px;
+}
+
+/* error pop-up text */
+.error {
+    color: var(--dark-text);
+    text-shadow: 1px 1px 2px var(--light-text);
+}
+
+/* error pop-up modal */
+.error-form {
+    background-color: var(--light-red);
+    border-color: var(--dark-red);
+    font-weight: 800;
+    box-shadow: 0 4px 12px var(--dark-text);
+}
+
+/* blur error pop-up */
+.error-form::backdrop {
+    backdrop-filter: blur(5px);
+}
+
+/* delete buttons */
+.delete-button {
+    background-color: var(--main-red);
+    color: white;
+}

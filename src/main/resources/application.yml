@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: finance
+    version: 1.0.0
+  output:
+    ansi:
+      enabled: always
+  datasource:
+    url: ${DB_URL} # protect sentive data
+    username: ${DB_USERNAME} # protect sentive data
+    password: ${DB_PASSWORD} # protect sentive data
+  
+  jpa:
+    hibernate:
+     ddl-auto: update # used update to generate table values from vs Code to database
+    show-sql: true
+
+  # needed to pass .env values to .yml
+  config:
+    import: optional:file:.env[.properties]
+
+# my port 8080 was occupied
+server:
+  port: 8081
