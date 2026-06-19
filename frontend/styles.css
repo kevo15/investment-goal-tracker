@@ -146,3 +146,56 @@
     background-color: var(--main-red);
     color: white;
 }
+
+.status-badge {
+    display: inline-block;
+    min-width: 130px;
+    padding: 8px 12px;
+    text-align: center;
+}
+
+.completed-status {
+    background-color: var(--accent-teal);
+}
+
+.at-risk {
+    background-color: var(--main-red);
+}
+
+.on-track {
+    background-color: var(--accent-teal);
+}
+
+.no-risk {
+    background-color: var(--light-text);
+}
+
+.progress-bar {
+    background-color: var(--main-red);
+}
+
+.name-col {
+    width: 25%;
+}
+
+.type-col {
+    width: 20%;
+}
+
+.priority-col {
+    width: 10%;
+}
+
+.progress-col {
+    width: 25%;
+}
+
+.status-col {
+    width: 10%;
+    text-align: "center";
+    justify-content: "center";
+}
+
+.update-col {
+    width: 10%
+}

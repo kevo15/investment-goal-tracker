@@ -16,6 +16,7 @@ const findByUrl = (URL) => {
             currentGoals = pageData.content;
             pageButtons(pageData, URL);
             pageData.content.forEach(goal => addGoalToTable(goal));        // adds found goals to table
+            pageData.content.forEach(goal => addStatusToTable(goal));
         })
         .catch((error) => {
             goalDeny.showModal();       // shows same validation message
@@ -44,12 +45,11 @@ const findByPage = (num, url) => {
         .then((pageData) => {
             emptyTable();                           // use function to empty table and only show new values
             currentGoals = pageData.content;        // populates current goals array with new goals
-            console.log(pageData);
             currentGoals.forEach(goal => addGoalToTable(goal));        // adds found goals to table
+            currentGoals.forEach(goal => addStatusToTable(goal));
         })
         .catch((error) => {
             goalDeny.showModal();       // shows same validation message
-            console.log(error);
         })
 }
 
@@ -97,6 +97,65 @@ const addGoalToTable = (newGoal) => { // takes in a goal
     tableBody.appendChild(tr);
 }
 
+const addStatusToTable = (newGoal) => { // takes in a goal
+    // creates a new row for the table
+    let tr  = document.createElement("tr");
+
+    // creating cells that will store values for columns that will be put in the table row
+    let nameTD = document.createElement("td");
+    let typeTD = document.createElement("td");
+    let priorityTD = document.createElement("td");
+    let progressTD = document.createElement("td");
+    let statusTD = document.createElement("td");
+
+    let updBtnTD = document.createElement("td");
+
+    let date = new Date(newGoal.targetDate);
+    let today = Date.now();
+    let daysAway = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+    let progressPercent = (newGoal.currentAmount / newGoal.targetAmount) * 100;
+
+    // assigning values from the goal to the cells
+    nameTD.innerText = newGoal.name;
+    typeTD.innerText = convertType(newGoal.goalType);       // converts to string before adding to table
+    progressTD.innerHTML = `
+        <div class="progress" style="height: 30px;">
+            <div 
+                class="progress-bar" 
+                role="progressbar" 
+                style="width: ${progressPercent}%; font-size: 16px;"
+                aria-valuenow="${newGoal.currentAmount}" 
+                aria-valuemin="0" 
+                aria-valuemax="${newGoal.targetAmount}">
+                ${Math.round(progressPercent)}%
+            </div>
+        </div>
+    `;    
+    priorityTD.innerText = newGoal.priority;
+    statusTD.classList.add("text-center");
+    statusTD.innerHTML = daysStatus(daysAway);
+
+    console.log(daysAway);
+
+    // creating the update button giving it an id and action to perform when clicked
+    updBtnTD.innerHTML = `<button class="btn update-button p-1" onclick="updateGoalForm(${newGoal.id})" id="UPD-${newGoal.id}">Update</button>`;
+
+    // adding the cells to the row
+    tr.appendChild(nameTD);
+    tr.appendChild(typeTD);
+    tr.appendChild(priorityTD);
+    tr.appendChild(progressTD);
+    tr.appendChild(statusTD);
+    tr.appendChild(updBtnTD);
+
+    // creating an id for the row that uses the goal id so each row has a unique id
+    tr.setAttribute("id", `TR-${newGoal.id}`);
+
+    // adding the row to the table body
+    let tableBody = document.getElementById("investment-status-table-body");
+    tableBody.appendChild(tr);
+}
+
 // function used to dynamically render page numbers
 const pageButtons = (pageData, url) => {
     // takes the total page number from response value
@@ -135,33 +194,18 @@ const emptyTable = () => {
 const resetTable = (goals) => {
     emptyTable();
     goals.forEach(goal => addGoalToTable(goal));
+    goals.forEach(goal => addStatusToTable(goal));
 }
 
-// function used to edit values of table without refresh
-const editGoalInTable = (goal) => {
+const renderBothTables = () => {
+    document.getElementById("investment-goal-table-body").innerHTML = "";
+    document.getElementById("investment-status-table-body").innerHTML = "";
 
-    /**
-     * using the current goal id to connect to the correct table row
-     *      updating the table cells with the values of the current goal
-     */
-    let goalType = convertType(goal.goalType);
-
-    document.getElementById(`TR-${goal.id}`).innerHTML = `
-    <td>${goal.name}</td>
-    <td>${goalType}</td>
-    <td>${goal.currentAmount}</td>
-    <td>${goal.targetAmount}</td>
-    <td>${goal.priority}</td>
-    <td>${goal.targetDate}</td>
-    <td><button class="btn update-button p-1" onclick="updateGoalForm(${goal.id})" id="UPD-${goal.id}">Update</button></td>
-    `
-}
-
-// function used to remove a goal from the table
-const removeGoalFromTable = (goalId) => {
-    // find the current table row with the goal id and removes it
-    document.getElementById(`TR-${goalId}`).remove();
-}
+    currentGoals.forEach((goal) => {
+        addGoalToTable(goal);
+        addStatusToTable(goal);
+    });
+};
 
 // function used to make sure the selected goal is stored
 const updateGoalForm = (goalId) => {
@@ -197,49 +241,42 @@ const delForm = () => {
 }
 
 // function used to sort table using column as a string and up/down for type
-const sortTable = (row, type) => {          
-    let table = document.getElementById("investment-goal-table");
-    let rows = Array.prototype.slice.call(table.querySelectorAll("tbody > tr"));
-    let cellA; let cellB;
+const sortTable = (row, type) => {
+    currentGoals.sort((goalA, goalB) => {
+        let valueA;
+        let valueB;
 
-    // sorts the rows by columns
-    rows.sort(function(rowA, rowB) {
-        // if statement to get proper column values
-        if(row == "name") {
-            cellA = rowA.cells[0].textContent;
-            cellB = rowB.cells[0].textContent;
-        } else if(row == "date") {
-            cellA = rowA.cells[5].textContent;
-            cellB = rowB.cells[5].textContent;
-        } else if(row == "progress") {
-            cellA = rowA.cells[3].textContent - rowA.cells[2].textContent;
-            cellB = rowB.cells[3].textContent - rowB.cells[2].textContent;
-        } else if(row == "priority") {
-            cellA = priorityOrdinal(rowA.cells[4].textContent);
-            cellB = priorityOrdinal(rowB.cells[4].textContent);
+        if (row === "name") {
+            valueA = goalA.name;
+            valueB = goalB.name;
+        } else if (row === "date") {
+            valueA = new Date(goalA.targetDate);
+            valueB = new Date(goalB.targetDate);
+        } else if (row === "progress") {
+            valueA = goalA.targetAmount - goalA.currentAmount;
+            valueB = goalB.targetAmount - goalB.currentAmount;
+        } else if (row === "priority") {
+            valueA = priorityOrdinal(goalA.priority);
+            valueB = priorityOrdinal(goalB.priority);
         }
-        // if statement to see if it should compare ascending/descending
-        if(type == "up") {
-            // compare for numerical values
-            if (!isNaN(cellA) && !isNaN(cellB)) {
-                return cellA - cellB;
+
+        if (type === "up") {
+            if (!isNaN(valueA) && !isNaN(valueB)) {
+                return valueA - valueB;
             }
-            // compare for spring values
-            return cellA.localeCompare(cellB); 
+
+            return String(valueA).localeCompare(String(valueB));
         } else {
-            // returns negative value to descend
-            if (!isNaN(cellA) && !isNaN(cellB)) {
-                return -(cellA - cellB);
+            if (!isNaN(valueA) && !isNaN(valueB)) {
+                return valueB - valueA;
             }
-            return -(cellA.localeCompare(cellB));
-        }
-    })
 
-    // readjusts table by sorted rows
-    rows.forEach(function(row) {
-    table.querySelector("tbody").appendChild(row);
+            return String(valueB).localeCompare(String(valueA));
+        }
     });
-}
+
+    renderBothTables();
+};
 
 // function used to return ordinal values of priority enum
 const priorityOrdinal = (text) => {
@@ -264,5 +301,17 @@ const convertType = (text) => {
         return "Retirement";
     } else {
         return "Emergency Fund";
+    }
+}
+
+const daysStatus = (daysAway) => {
+    if(daysAway == 0 || daysAway < 0) {
+        return `<span class="badge badge-pill text-center completed-status">Completed</span>`;
+    } else if(daysAway < 365) {
+        return `<span class="badge badge-pill at-risk">At Risk</span>`; 
+    } else if (daysAway < 800) {
+        return `<span class="badge badge-pill on-track">On Track</span>`;
+    } else if (daysAway > 800) {
+        return `<span class="badge badge-pill no-risk">Recently Started</span>`;
     }
 }

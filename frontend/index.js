@@ -67,6 +67,7 @@ document.getElementById("new-goal-form").addEventListener("submit", (eventInfo) 
     })
     .then((goal) => {
         addGoalToTable(goal);       // adds new investment goal to table
+        addStatusToTable(goal);
         currentGoals.push(goal);        // add the goal to the list of goals
     })
     .catch((error) => {
@@ -113,8 +114,8 @@ document.getElementById("edit-goal-form").addEventListener("submit", (eventInfo)
     })
     .then((goal) => {
         currentGoals.pop(selectedGoal);         // remove the current version of the goal from the list of goals
-        editGoalInTable(goal);                  // edits the already existing goal within the table
         currentGoals.push(goal);                // add the updated version of the goal to the list
+        renderBothTables(goal);
     })
     .catch((error) => {
         console.log(error);
@@ -137,8 +138,8 @@ document.getElementById("del-goal-form").addEventListener("submit", (eventInfo) 
     .then((httpResponse) => {
 
         if(httpResponse.status === 204) {           // checks request for valid success status code
-            removeGoalFromTable(selectedGoal.id);   // calls method to remove deleted goal from table
             currentGoals.pop(selectedGoal);
+            renderBothTables();
         }
     })
     .catch((error) => {

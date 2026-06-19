@@ -94,3 +94,20 @@ document.getElementById("next").addEventListener("click", () => {
         findByPage(pageNum, currentUrl);
     } 
 })      // next button for page navigation
+document.getElementById("switch-view").addEventListener("click", () => {
+    let statusTableBg = document.getElementById("status-table-bg");
+    let tableBg = document.getElementById("table-bg");
+
+    if (statusTableBg.style.display === "none" || statusTableBg.style.display === "") {
+        statusTableBg.style.display = "block";
+        tableBg.style.display = "none";
+
+        let tableBody = document.getElementById("investment-status-table-body");
+        tableBody.innerHTML = "";
+
+        currentGoals.forEach((goal) => addStatusToTable(goal));
+    } else {
+        statusTableBg.style.display = "none";
+        tableBg.style.display = "block";
+    }
+});

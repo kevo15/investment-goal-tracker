@@ -44,9 +44,27 @@
             </div>
         </div>
     </div>
+
+    <div id="status-table-bg" style="display: none;">
+        <table id="investment-status-table" class="investment-table table table-hover m-1">
+            <thead>
+                <tr>
+                    <th id="name" class="name-col p-2">Goal Name</th>
+                    <th id="type" class="type-col p-2 px-4">Goal Type</th>
+                    <th id="priority" class="priority-col p-2">Priority Level</th>
+                    <th id="progress" class="progress-col p-2 px-1">Progress</th>
+                    <th id="status" class="status-col p-2 px-4">Status</th>  
+                    <th class="update-col p-2">Update</th> 
+                </tr>
+            </thead>
+            <tbody id="investment-status-table-body" class="investment-table-body">
+                <!-- investment goal data is added by the JS -->
+            </tbody>
+        </table>
+    </div>
     
     <!-- investment table -->
-    <div class="table-bg">
+    <div id="table-bg">
         <table id="investment-goal-table" class="investment-table table table-hover m-1">
             <thead>
                 <tr>
@@ -67,12 +85,15 @@
 
     <!-- page number container -->
     <div class="row my-4 justify-content-center">
-        <div class="col d-flex text-center justify-content-center align-items-center gap-2">
+        <div class="col-11 d-flex text-center justify-content-center align-items-center gap-2">
             <button id="previous" class="crud-button h5">Previous</button>
         <div id="page-buttons" class="btn-group">
             <!-- JS adds the page buttons dynamically -->
         </div>
             <button id="next" class="crud-button h5">Next</button>
+        </div>
+        <div class="col-1 text-start">
+            <button class="submit-button" id="switch-view">Switch View</button>
         </div>
     </div>
 
