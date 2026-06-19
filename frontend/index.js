@@ -1,8 +1,11 @@
 // All CRUD operations
 
 const BACKEND_URL = "http://localhost:8081/investment";
-let allGoals = [];      // variable to hold the investment goals
-let selectedGoal;       // variable that stores the current investment goal
+let currentUrl = BACKEND_URL;
+let currentGoals = [];      // variable to hold the investment goals
+let selectedGoal;           // variable that stores the current investment goal
+let pageNum = 0;
+let totalPages = 1;
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -12,15 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if(xhr.readyState === 4) {
 
-            let goals = JSON.parse(xhr.responseText);
+            let pageData = JSON.parse(xhr.responseText);
 
-            console.log(goals);
+            console.log(pageData);
 
             // add all goals from database into an array
-            allGoals = goals;
+            currentGoals = pageData.content;
 
             // for each found goal calls method that populates the table
-            goals.forEach(goal => addGoalToTable(goal));
+            pageData.content.forEach(goal => addGoalToTable(goal));
+            pageButtons(pageData, BACKEND_URL);
         }
     };
 
@@ -63,7 +67,8 @@ document.getElementById("new-goal-form").addEventListener("submit", (eventInfo) 
     })
     .then((goal) => {
         addGoalToTable(goal);       // adds new investment goal to table
-        allGoals.push(goal);        // add the goal to the list of goals
+        addStatusToTable(goal);
+        currentGoals.push(goal);        // add the goal to the list of goals
     })
     .catch((error) => {
         goalDeny.showModal();       // displays a popup menu that tells the user their request was invalid
@@ -108,11 +113,12 @@ document.getElementById("edit-goal-form").addEventListener("submit", (eventInfo)
         return null;
     })
     .then((goal) => {
-        allGoals.pop(selectedGoal);         // remove the current version of the goal from the list of goals
-        editGoalInTable(goal);              // edits the already existing goal within the table
-        allGoals.push(goal);                // add the updated version of the goal to the list
+        currentGoals.pop(selectedGoal);         // remove the current version of the goal from the list of goals
+        currentGoals.push(goal);                // add the updated version of the goal to the list
+        renderBothTables(goal);
     })
     .catch((error) => {
+        console.log(error);
         goalDeny.showModal();               // displays same error message for invalid inputs
     })
     .finally(() => {
@@ -132,8 +138,8 @@ document.getElementById("del-goal-form").addEventListener("submit", (eventInfo) 
     .then((httpResponse) => {
 
         if(httpResponse.status === 204) {           // checks request for valid success status code
-            removeGoalFromTable(selectedGoal.id);   // calls method to remove deleted goal from table
-            allGoals.pop(selectedGoal);
+            currentGoals.pop(selectedGoal);
+            renderBothTables();
         }
     })
     .catch((error) => {
@@ -155,22 +161,22 @@ document.getElementById("find-by-form").addEventListener("submit", (eventInfo) =
         // assigns input name value to a variable to add it to URL
         let searchName = document.getElementById("find-goal-name").value;
         // creates a Url for helper function
-        let nameUrl = BACKEND_URL + `?name=${searchName}`;
+        currentUrl = BACKEND_URL + `?name=${searchName}`;
         // calls helper function to find by name
-        findByUrl(nameUrl);
+        findByUrl(currentUrl);
     } else if(document.getElementById("find-goal-priority").value == "") {      // check if priority is populated
         // creates a variable to get goal type input
         let searchType = document.getElementById("find-goal-type").value;
         // creates url for helper function
-        let typeUrl = BACKEND_URL + `?goalType=${searchType}`;
+        currentUrl = BACKEND_URL + `?goalType=${searchType}`;
         // calls helper function to find by type
-        findByUrl(typeUrl);
+        findByUrl(currentUrl,);
     } else {
         // creates variable to hold goal priority input
         let searchPriority = document.getElementById("find-goal-priority").value;
         // creates url for helper function
-        let priorityUrl = BACKEND_URL + `?priority=${searchPriority}`;
+        currentUrl = BACKEND_URL + `?priority=${searchPriority}`;
         // calls helper function to find by priority
-        findByUrl(priorityUrl);
+        findByUrl(currentUrl);
     }
 })
