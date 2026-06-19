@@ -2,6 +2,9 @@ package com.skillstorm.services;
 
 import java.time.LocalDate;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -22,18 +25,19 @@ public class InvestmentService {
     }
 
     // wrap return in ResponseEntity to provide Web Response codes
-    public ResponseEntity<Iterable<InvestmentGoal>> getAll(String name, GoalType goalType, Priority priority) {
+    public ResponseEntity<Page<InvestmentGoal>> getAll(String name, GoalType goalType, Priority priority, int page) {
+        Pageable pages = PageRequest.of(page, 15);
         if (name == null && goalType == null && priority == null) {
-            return ResponseEntity.ok(this.repo.findAll()); // findAll is one of those pre created methods
+            return ResponseEntity.ok(this.repo.findAll(pages)); // findAll is one of those pre created methods
         } else if (name != null) {
             // added a custom method to find a Investment Goal by name
-            return ResponseEntity.ok(this.repo.findByNameStartsWith(name));
+            return ResponseEntity.ok(this.repo.findByNameStartsWith(name, pages));
         } else if (goalType != null){
             // added a custom method to find a Investment Goal by goal type
-            return ResponseEntity.ok(this.repo.findByGoalType(goalType));
+            return ResponseEntity.ok(this.repo.findByGoalType(goalType, pages));
         }
         // added a custom method to find a Investment Goal by priority
-        return ResponseEntity.ok(this.repo.findByPriority(priority));
+        return ResponseEntity.ok(this.repo.findByPriority(priority, pages));
     }
 
     // create and update methods will need a InvestmentDto so id value will not be provided

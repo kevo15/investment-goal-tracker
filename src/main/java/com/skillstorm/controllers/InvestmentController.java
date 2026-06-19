@@ -10,6 +10,7 @@ import com.skillstorm.models.InvestmentGoal;
 import com.skillstorm.models.Priority;
 import com.skillstorm.services.InvestmentService;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,11 +34,12 @@ public class InvestmentController {
     }
 
     @GetMapping // could take params, but with no params maps any get request that uses /investment to this method
-    public ResponseEntity<Iterable<InvestmentGoal>> getAll(@RequestParam(required = false) String name,
-        @RequestParam(required = false) GoalType goalType, @RequestParam(required = false) Priority priority) {                                                   
+    public ResponseEntity<Page<InvestmentGoal>> getAll(@RequestParam(required = false) String name,
+        @RequestParam(required = false) GoalType goalType, @RequestParam(required = false) Priority priority,
+        @RequestParam(defaultValue = "0") int page) {                                                   
         
         // added optional params to search by different values
-        return service.getAll(name, goalType, priority);
+        return service.getAll(name, goalType, priority, page);
     }
 
     @PostMapping // maps /investment post request to this controller

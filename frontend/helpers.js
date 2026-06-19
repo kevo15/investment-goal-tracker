@@ -11,9 +11,11 @@ const findByUrl = (URL) => {
             }
             return null;
         })
-        .then((goals) => {
+        .then((pageData) => {
             emptyTable();               // use function to empty table and only show new values
-            goals.forEach(goal => addGoalToTable(goal));        // adds found goals to table
+            currentGoals = pageData.content;
+            pageButtons(pageData, URL);
+            pageData.content.forEach(goal => addGoalToTable(goal));        // adds found goals to table
         })
         .catch((error) => {
             goalDeny.showModal();       // shows same validation message
@@ -21,6 +23,33 @@ const findByUrl = (URL) => {
         .finally(() => {      
             findBy.close();             // closes findBy popup
             document.getElementById("find-by-form").reset();    // resets find By popup to default values
+        })
+}
+
+// function used to find page contents by page number
+const findByPage = (num, url) => {
+    pageNum = num;                      // sets page number to given num
+    let myUrl = new URL(url);           // creates url value
+    myUrl.searchParams.set("page", num);        // updates page number search param
+    let currentUrl = myUrl.toString();          // returns the value to a string for fetch call
+
+    fetch(currentUrl, {method: "GET"})
+        .then((httpResponse) => {
+
+            if(httpResponse.status === 200) {       // returns a status code 200 on completion
+                return httpResponse.json();         // returns an investment goal
+            }
+            return null;
+        })
+        .then((pageData) => {
+            emptyTable();                           // use function to empty table and only show new values
+            currentGoals = pageData.content;        // populates current goals array with new goals
+            console.log(pageData);
+            currentGoals.forEach(goal => addGoalToTable(goal));        // adds found goals to table
+        })
+        .catch((error) => {
+            goalDeny.showModal();       // shows same validation message
+            console.log(error);
         })
 }
 
@@ -68,6 +97,34 @@ const addGoalToTable = (newGoal) => { // takes in a goal
     tableBody.appendChild(tr);
 }
 
+// function used to dynamically render page numbers
+const pageButtons = (pageData, url) => {
+    // takes the total page number from response value
+    totalPages = pageData.totalPages;
+
+    let pageButtonContainer = document.getElementById("page-buttons");
+
+    // make sure all buttons are cleared
+    pageButtonContainer.innerHTML = "";
+
+    // loop through current pages
+    for (let i = 0; i < totalPages; i++) {
+        let button = document.createElement("button");
+
+        // assigns button class for styling, id for lister, and value
+        button.className = "btn crud-button h5";
+        button.id = `page-${i + 1}`;
+        button.textContent = i + 1;
+
+        // i is the page recieved from database
+        button.addEventListener("click", () => {
+            findByPage(i, url);
+        });
+
+        pageButtonContainer.appendChild(button);
+    }
+};
+
 // function to clear out table
 const emptyTable = () => {
     // sets table HTML to nothing to remove table body without removing id
@@ -87,14 +144,16 @@ const editGoalInTable = (goal) => {
      * using the current goal id to connect to the correct table row
      *      updating the table cells with the values of the current goal
      */
+    let goalType = convertType(goal.goalType);
+
     document.getElementById(`TR-${goal.id}`).innerHTML = `
     <td>${goal.name}</td>
-    <td>${goal.goalType}</td>
+    <td>${goalType}</td>
     <td>${goal.currentAmount}</td>
     <td>${goal.targetAmount}</td>
     <td>${goal.priority}</td>
     <td>${goal.targetDate}</td>
-    <td><button class="btn btn-primary p-1" onclick="updateGoalForm(${goal.id})" id="UPD-${goal.id}">Update</button></td>
+    <td><button class="btn update-button p-1" onclick="updateGoalForm(${goal.id})" id="UPD-${goal.id}">Update</button></td>
     `
 }
 
@@ -107,7 +166,7 @@ const removeGoalFromTable = (goalId) => {
 // function used to make sure the selected goal is stored
 const updateGoalForm = (goalId) => {
     // loops through list of goals and finds the current goal id
-    for(let goal of allGoals) {
+    for(let goal of currentGoals) {
         if(goal.id === goalId) {
             selectedGoal = goal; // makes the selected goal the found goal
             break;

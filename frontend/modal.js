@@ -21,7 +21,7 @@ document.getElementById("close-goal-btn").addEventListener("click", () => {
     goalPopup.close();
 })      // close create goal modal button
 document.getElementById("find-all-btn").addEventListener("click", () => {
-    resetTable(allGoals);
+    findByUrl(BACKEND_URL)
     findBy.close();
 })      // button to find all goals 
 document.getElementById("by-name-up").addEventListener("click", () => {
@@ -72,3 +72,25 @@ document.getElementById("del-btn").addEventListener("click", () => {
 document.getElementById("close-del-btn").addEventListener("click", () => {
     delGoalPopup.close();
 })      // close delete goal modal button
+document.getElementById("previous").addEventListener("click", () => {
+    if(pageNum <= 0 || pageNum > totalPages - 1) {
+        pageNum = 0;
+        emptyTable();
+        findByPage(pageNum, currentUrl);
+    } else if(pageNum != 0) {
+        pageNum--;
+        emptyTable();
+        findByPage(pageNum, currentUrl);
+    }
+})      // previous button for page navigation
+document.getElementById("next").addEventListener("click", () => {
+    if(pageNum >= totalPages - 1 || pageNum < 0) {
+        pageNum = totalPages - 1;
+        emptyTable();
+        findByPage(pageNum, currentUrl);
+    } else if(pageNum != totalPages) {
+        pageNum++;
+        emptyTable();
+        findByPage(pageNum, currentUrl);
+    } 
+})      // next button for page navigation
